@@ -30,8 +30,10 @@ public class QuestionController {
    }
 
    @GetMapping
-   public Flux<QuestionResponseDTO> getAllQuestions() {
-       return questionService.getAllQuestions()
+   public Flux<QuestionResponseDTO> getAllQuestions(
+              @RequestParam(required = false) String cursor,
+              @RequestParam(defaultValue = "10") int limit) {
+       return questionService.getAllQuestions(cursor,limit)
                .doOnComplete(() -> System.out.println("All questions retrieved"))
                .doOnError(e -> System.err.println("Error retrieving all questions: " + e.getMessage()));
    }
@@ -39,9 +41,11 @@ public class QuestionController {
    @GetMapping("/search")
    public Flux<QuestionResponseDTO> searchQuestions(
            @RequestParam String query,
-           @RequestParam(defaultValue = "0") int page,
-           @RequestParam(defaultValue = "10") int size) {
-       throw new UnsupportedOperationException("Method not implemented yet");
+           @RequestParam(defaultValue = "0") int offset,
+           @RequestParam(defaultValue = "10") int limit) {
+         return questionService.searchQuestions(query, offset, limit)
+                .doOnComplete(() -> System.out.println("Search completed for term: " + query))
+                .doOnError(e -> System.err.println("Error searching questions: " + e.getMessage()));
    }
 
    @GetMapping("/tag/{tag}")
