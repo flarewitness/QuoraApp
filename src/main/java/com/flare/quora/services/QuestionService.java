@@ -7,6 +7,7 @@ import com.flare.quora.models.Question;
 import com.flare.quora.repositories.QuestionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
@@ -30,5 +31,21 @@ public class QuestionService implements IQuestionService{
                 .map(QuestionMapper::toQuestionResponseDTO)
                 .doOnSuccess(q -> System.out.println("Question created: " + q.getId()))
                 .doOnError(e -> System.err.println("Error creating question: " + e.getMessage()));
+    }
+
+    @Override
+    public Mono<QuestionResponseDTO> getQuestionById(String questionId) {
+        return questionRepository.findById(questionId)
+                .map(QuestionMapper::toQuestionResponseDTO)
+                .doOnSuccess(q -> System.out.println("Question retrieved: " + q.getId()))
+                .doOnError(e -> System.err.println("Error retrieving question: " + e.getMessage()));
+    }
+
+    @Override
+    public Flux<QuestionResponseDTO> getAllQuestions() {
+        return questionRepository.findAll()
+                .map(QuestionMapper::toQuestionResponseDTO)
+                .doOnComplete(() -> System.out.println("All questions retrieved"))
+                .doOnError(e -> System.err.println("Error retrieving all questions: " + e.getMessage()));
     }
 }

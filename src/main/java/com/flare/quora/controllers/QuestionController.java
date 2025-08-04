@@ -24,12 +24,16 @@ public class QuestionController {
 
     @GetMapping("/{id}")
     public Mono<QuestionResponseDTO> getQuestionById(@PathVariable String id) {
-        throw new UnsupportedOperationException("Method not implemented yet");
+        return questionService.getQuestionById(id)
+                .doOnSuccess(q -> System.out.println("Question retrieved: " + q.getId()))
+                .doOnError(e -> System.err.println("Error retrieving question: " + e.getMessage()));
    }
 
    @GetMapping
    public Flux<QuestionResponseDTO> getAllQuestions() {
-       throw new UnsupportedOperationException("Method not implemented yet");
+       return questionService.getAllQuestions()
+               .doOnComplete(() -> System.out.println("All questions retrieved"))
+               .doOnError(e -> System.err.println("Error retrieving all questions: " + e.getMessage()));
    }
 
    @GetMapping("/search")
