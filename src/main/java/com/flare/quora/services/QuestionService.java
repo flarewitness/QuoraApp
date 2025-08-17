@@ -2,8 +2,10 @@ package com.flare.quora.services;
 
 import com.flare.quora.dto.QuestionRequestDTO;
 import com.flare.quora.dto.QuestionResponseDTO;
+import com.flare.quora.events.ViewCountEvent;
 import com.flare.quora.mapper.QuestionMapper;
 import com.flare.quora.models.Question;
+import com.flare.quora.producers.KafkaEventProducer;
 import com.flare.quora.repositories.QuestionRepository;
 import com.flare.quora.utils.CursorUtils;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,8 @@ import java.time.LocalDateTime;
 public class QuestionService implements IQuestionService{
 
     private final QuestionRepository questionRepository;
+
+    private final KafkaEventProducer kafkaEventProducer;
 
     @Override
     public Mono<QuestionResponseDTO> createQuestion(QuestionRequestDTO questionRequestDTO) {
@@ -40,7 +44,15 @@ public class QuestionService implements IQuestionService{
     public Mono<QuestionResponseDTO> getQuestionById(String questionId) {
         return questionRepository.findById(questionId)
                 .map(QuestionMapper::toQuestionResponseDTO)
-                .doOnSuccess(q -> System.out.println("Question retrieved: " + q.getId()))
+                .doOnSuccess(q -> {
+                    System.out.println("Question retrieved: " + q.getId());
+                    ViewCountEvent viewCountEvent = ViewCountEvent.builder()
+                            .targetId(q.getId())
+                            .targetType("question")
+                            .timestamp(LocalDateTime.now())
+                            .build();
+                    kafkaEventProducer.publishViewCountEvent(viewCountEvent);
+                })
                 .doOnError(e -> System.err.println("Error retrieving question: " + e.getMessage()));
     }
 
