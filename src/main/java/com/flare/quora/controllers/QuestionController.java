@@ -2,11 +2,14 @@ package com.flare.quora.controllers;
 
 import com.flare.quora.dto.QuestionRequestDTO;
 import com.flare.quora.dto.QuestionResponseDTO;
+import com.flare.quora.models.QuestionElasticDocument;
 import com.flare.quora.services.IQuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/questions")
@@ -55,6 +58,11 @@ public class QuestionController {
            @RequestParam(defaultValue = "10") int size) {
        throw new UnsupportedOperationException("Method not implemented yet");
 
+   }
+
+   @GetMapping("/elasticsearch")
+   public List<QuestionElasticDocument> searchQuestionsInElastic(@RequestParam String searchTerm) {
+         return questionService.searchQuestionsInElastic(searchTerm);
    }
 
 }

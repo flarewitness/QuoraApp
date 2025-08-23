@@ -2,8 +2,11 @@ package com.flare.quora.services;
 
 import com.flare.quora.dto.QuestionRequestDTO;
 import com.flare.quora.dto.QuestionResponseDTO;
+import com.flare.quora.models.QuestionElasticDocument;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 public interface IQuestionService {
 
@@ -15,5 +18,5 @@ public interface IQuestionService {
 
     Flux<QuestionResponseDTO> searchQuestions(String searchTerm, int offset, int limit);
 
-
+    List<QuestionElasticDocument> searchQuestionsInElastic(String searchTerm);
 }
